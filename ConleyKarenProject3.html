@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+<title>Responsive Interactive Canvas</title>
+<script>
+	  var canvas;
+	  var context;
+	  var shapes = []
+	  var timer;
+	  var timerTwo;
+	  var possibleShapes = ['horns','circle','glasses', 'thing', 'heart'];
+	  
+	  function Shape(x, y, color) {
+		this.x = x;
+		this.y = y;
+		this.size = Math.random()*20+5;
+		this.dx = Math.random()*4-2;
+		this.dy = Math.random()*4-2;
+		this.color = color;
+		this.shape = possibleShapes[Math.floor(Math.random()*possibleShapes.length)];
+	  }
+	  function init() {
+        canvas = document.getElementById('canvas');
+        context = canvas.getContext("2d");
+ 
+        window.addEventListener('resize', resizeCanvas, false);
+        window.addEventListener('orientationchange', resizeCanvas, false);
+        resizeCanvas();
+		canvas.onclick = function(event) {
+			handleClick(event.clientX, event.clientY);
+		};
+		timer = setInterval(resizeCanvas, 40);
+		timerTwo = setInterval(newShape, 200);
+      }
+	  function newShape() {
+		var x = Math.random() * canvas.width;
+		var y = Math.random() * canvas.height;
+		var colors = ["red", "orange", "yellow", "pink",];
+		var color = colors[Math.floor(Math.random()*colors.length)];
+		shapes.push(new Shape(x, y, color));
+		
+	  }
+	  function drawCircle(circle) {
+		 context.beginPath();
+		 context.arc(circle.x, circle.y, circle.size, 0, degreesToRadians(360), true);
+		 context.strokeStyle = circle.color;
+		 context.stroke();
+      }	
+	  function drawGlasses(glasses) {
+		 context.beginPath();
+		 context.moveTo(glasses.x, glasses.y);
+		 context.bezierCurveTo(glasses.x-40, glasses.y+20, glasses.x-70, glasses.y+70, glasses.x+60, glasses.y+30);
+		 context.bezierCurveTo(glasses.x+80, glasses.y+100, glasses.x+170, glasses.y+100, glasses.x+170, glasses.y+70);
+		  context.closePath();
+		  context.lineWidth = 5;
+		  context.strokeStyle = glasses.color;
+		  context.stroke();
+	  }
+
+	  function drawHorns(horns) {
+		    context.beginPath();
+			context.lineJoin = 'miter';
+			context.moveTo(horns.x, horns.y);
+			context.arc(horns.x, horns.y-68, 34.5, 5.75, 3.66, false);
+			context.quadraticCurveTo(horns.x-3.5, horns.y+15, horns.x, horns.y);
+			context.closePath();
+			context.lineWidth = 2;
+			context.fillStyle = horns.color;
+			context.fill();
+	  }
+	  function drawHeart(heart) {
+	  	context.beginPath();
+	  	context.moveTo(heart.x, heart.y);
+	  	context.bezierCurveTo(heart.x-100, heart.y+40, heart.x-100, heart.y+40, heart.x+40, heart.y+40);
+		context.bezierCurveTo(heart.x+40, heart.y-40, heart.x+40, heart.y-40, heart.x+40, heart.y-40);
+		context.closePath();
+		context.fill();
+	  }
+	  	function drawThing(thing) {
+	  	context.beginPath();
+	  	context.moveTo(thing.x, thing.y);
+	  	context.bezierCurveTo(thing.x-100, thing.y+40, thing.x-100, thing.y+40, thing.x+40, thing.y+40);
+		context.bezierCurveTo(thing.x+40, thing.y-40, thing.x+40, thing.y-40, thing.x+40, thing.y-40);
+		context.closePath();
+		context.fill();
+	}
+	  function drawText() {
+		context.fillStyle = 'white';
+		context.font = 'bold 2em sans-serif';
+		context.textAlign = 'center';
+		context.fillText('Project 3?', canvas.width-40, canvas.height-40);
+	} 
+	  function resizeCanvas() {
+        canvas.width = window.innerWidth-20;
+        canvas.height = window.innerHeight-20;
+		fillBackgroundColor();
+		for (var i=0; i<shapes.length; i++) {
+			if (shapes[i].shape == 'heart') {
+				drawHeart(shapes[i]);
+			} else if (shapes[i].shape == 'circle') {
+				drawCircle(shapes[i]);
+			} else if (shapes[i].shape == 'horns') {
+				drawHorns(shapes[i]);
+			} else if (shapes[i].shape == 'glasses') {
+				drawGlasses(shapes[i]);
+			} else if (shapes[i].shape == 'thing') {
+				drawThing(shapes[i]);	
+			}
+
+			if (shapes[i].x + shapes[i].dx > canvas.width || shapes[i].x + shapes[i].dx < 0)
+				shapes[i].dx = -shapes[i].dx;
+			if (shapes[i].y + shapes[i].dy > canvas.height || shapes[i].y + shapes[i].dy < 0)
+				shapes[i].dy = -shapes[i].dy;
+				shapes[i].x += shapes[i].dx;
+				shapes[i].y += shapes[i].dy;
+		}
+		drawText();		 
+      }
+	  function fillBackgroundColor() {
+		 context.fillStyle = 'black';
+		 context.fillRect(0, 0, canvas.width, canvas.height);
+	}
+	function degreesToRadians(degrees) {
+		return (degrees * Math.PI)/180;
+	}
+	window.onload = init;
+</script>
+</head>
+<body>
+<canvas id='canvas' width=500 height=500></canvas>
+</body>	  
